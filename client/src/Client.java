@@ -1,0 +1,389 @@
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+
+public class Client {
+    static JTextField host;
+    static JTextField port;
+    static JButton button;
+    static JLabel imgLabel;
+    static JLabel connected;
+    static JButton upload;
+    static JPanel jPanel;
+    static JPanel jPanelConnection;
+    static JPanel deleteJpanel;
+    static JPanel jPanelUpload;
+    Button[] buttons;
+    static JButton showFileButton;
+    static JFrame jFrame2nd;
+
+    static ArrayList<MyFile> myFiles = new ArrayList<>();
+    static Socket socket = null;
+    static InputStream inputStream = null;
+    static OutputStream outputStream = null;
+    static DataOutputStream dataOutputStream = null;
+    static ObjectOutputStream objectOutputStream;
+    static ObjectInputStream objectInputStream;
+    static JScrollPane jScrollPane;
+    static JPanel jpFileRow;
+    static JLabel jlFileName;
+    static JFrame jFrame;
+    static Color backgroundColor;
+
+
+    public static void main(String[] args) throws IOException, UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+        jFrame = new JFrame("Client");
+        jFrame.setSize(500, 800);
+        jFrame.setLayout(new BoxLayout(jFrame.getContentPane(), BoxLayout.Y_AXIS));
+       jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        jPanelConnection = new JPanel();
+        jPanelConnection.setLayout(new GridLayout(1, 3));
+        jPanelConnection.setPreferredSize(new Dimension(10, 50));
+        jPanelConnection.setBorder(new EmptyBorder(1,10, 10,10));
+
+
+       jPanel = new JPanel();
+       jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.Y_AXIS));
+       jPanel.setBorder(new EmptyBorder(10,10, 150,10));
+
+
+
+         jScrollPane = new JScrollPane(jPanel);
+        // Make it so there is always a vertical scrollbar.
+        jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+
+
+        final File[] fileToSend = new File[1];
+        int deleteId = 0;
+
+        host = new JTextField();
+        host.setBounds(80, 20, 100, 50);
+        host.setText("localhost");
+        host.setToolTipText("Enter host IP");
+
+        Font fieldFont = new Font("Arial", Font.PLAIN, 20);
+        host.setFont(fieldFont);
+        host.setBackground(Color.white);
+        host.setForeground(Color.black.brighter());
+        host.setColumns(30);
+        host.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+
+
+
+        port = new JTextField();
+        port.setBounds(250, 20, 150, 50);
+        port.setText("6000");
+        port.setToolTipText("Enter port no");
+        port.setFont(fieldFont);
+        port.setForeground(Color.black.brighter());
+        port.setColumns(30);
+        port.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 5, 25))));
+
+        // Image
+
+        imgLabel = new JLabel();
+        imgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        imgLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        imgLabel.setIcon(new ImageIcon("/home/rumi/Downloads/image1.jpg"));
+
+
+        connected = new JLabel("Connected with server");
+        connected.setBackground(Color.green);
+        connected.setFont(fieldFont);
+        connected.setBounds(420,10,100,30);
+        connected.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+        connected.setVisible(false);
+
+        button = new JButton("Connect");
+        button.setBackground(Color.black);
+        button.setForeground(Color.white);
+        Font bFont = new Font("Arial", Font.BOLD, 20);
+        button.setFont(bFont);
+
+        button.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                _hide();
+                try {
+                    socket = new Socket(host.getText(), Integer.parseInt(port.getText()));
+                    Client.outputStream = socket.getOutputStream();
+                    Client.inputStream = socket.getInputStream();
+                    getFileInfo();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
+        upload = new JButton("Upload");
+        upload.setBounds(5, 5, 70, 50);
+        upload.setFont(fieldFont);
+        upload.setBackground(Color.black);
+        upload.setForeground(Color.white);
+        upload.setVisible(false);
+        upload.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+        upload.addActionListener(new java.awt.event.ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                try {
+                    JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setDialogTitle("Choose a file to send");
+
+                    if (fileChooser.showOpenDialog(null)  == JFileChooser.APPROVE_OPTION) {
+                        // Get the selected file.
+                        fileToSend[0] = fileChooser.getSelectedFile();
+                        // Change the text of the java swing label to have the file name.
+                        //jlFileName.setText("The file you want to send is: " + fileToSend[0].getName());
+
+                        try {
+
+                            FileInputStream fileInputStream = new FileInputStream(fileToSend[0].getAbsolutePath());
+                             dataOutputStream = new DataOutputStream(Client.outputStream);
+                            String fileName = fileToSend[0].getName();
+                            byte[] fileNameBytes = fileName.getBytes();
+                            byte[] fileBytes = new byte[(int)fileToSend[0].length()];
+                            String op = new String("upload");
+                            byte[] operation  = op.getBytes();
+                            fileInputStream.read(fileBytes);
+
+                            dataOutputStream.writeInt(operation.length);
+                            dataOutputStream.write(operation);
+
+                            dataOutputStream.writeInt(fileNameBytes.length);
+                            dataOutputStream.write(fileNameBytes);
+                            dataOutputStream.writeInt(fileBytes.length);
+                            dataOutputStream.write(fileBytes);
+
+                            getSingleElement();
+
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        jFrame.add(Box.createVerticalStrut(5));
+        jPanelConnection.add(host);
+        jPanelConnection.add(port);
+        jPanelConnection.add(button);
+
+        jFrame.add(jPanelConnection);
+
+
+        //jFrame.add(host);
+       // jFrame.add(Box.createVerticalStrut(10));
+        //jFrame.add(port);
+        //jFrame.add(Box.createVerticalStrut(10));
+        //jFrame.add(button);
+       // jFrame.add(Box.createVerticalStrut(10));
+        jFrame.add(imgLabel);
+        //jFrame.add(connected);
+        jFrame.add(Box.createVerticalStrut(10));
+        jFrame.add(upload);
+        jFrame.add(Box.createVerticalStrut(10));
+        jFrame.add(jScrollPane, BorderLayout.CENTER);
+
+        jFrame.setVisible(true);
+        jFrame.setEnabled(true);
+
+
+    }
+
+
+    static void _hide(){
+        jPanelConnection.setVisible(false);
+        connected.setVisible(true);
+        upload.setVisible(true);
+        imgLabel.setVisible(false);
+        connected.setVisible(true);
+        upload.setVisible(true);
+
+
+    }
+
+    static public void downloadFile(int fileId){
+        try {
+             dataOutputStream = new DataOutputStream(Client.outputStream);
+            String op = new String("download");
+            byte[] operation  = op.getBytes();
+
+            dataOutputStream.writeInt(operation.length);
+            dataOutputStream.write(operation);
+
+            dataOutputStream.writeInt(fileId);
+
+             DataInputStream dataInputStream = new DataInputStream(Client.inputStream);
+             int fileNameLenght = dataInputStream.readInt();
+            byte[] fileNameBytes = new byte[fileNameLenght];
+            dataInputStream.readFully(fileNameBytes, 0, fileNameBytes.length);
+            String fileName = new String(fileNameBytes);
+
+            System.out.println(fileName);
+            int fileContentLength = dataInputStream.readInt();
+            byte[] fileContentBytes = new byte[fileContentLength];
+            dataInputStream.readFully(fileContentBytes, 0, fileContentBytes.length);
+
+
+            // Write file to a file
+            File file = new File(fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            fileOutputStream.write(fileContentBytes);
+            fileOutputStream.close();
+
+            //  }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getSingleElement() throws IOException, ClassNotFoundException {
+        ObjectInputStream objectInputStream = new ObjectInputStream(Client.inputStream);
+        Object object = objectInputStream.readObject();
+        MyFile newFile = (MyFile) object;
+        myFiles.add(newFile);
+
+        System.out.println(newFile.getId() + " " + newFile.getName());
+        addIntoScrollPanel(newFile);
+
+    }
+
+    public static void getFileInfo() throws IOException, ClassNotFoundException {
+        myFiles = null;
+        objectInputStream = new ObjectInputStream(Client.inputStream);
+        Object object = objectInputStream.readObject();
+        myFiles = (ArrayList<MyFile>) object;
+
+        for (MyFile file : myFiles) {
+           addIntoScrollPanel(file);
+
+        }
+    }
+
+    static public void deleteFile(int fileId)
+    {
+        try {
+            dataOutputStream = new DataOutputStream(Client.outputStream);
+            String op = new String("delete");
+            byte[] operation  = op.getBytes();
+            dataOutputStream.writeInt(operation.length);
+            dataOutputStream.write(operation);
+
+            dataOutputStream.writeInt(fileId);
+            DataInputStream dataInputStream = new DataInputStream(inputStream);
+            int msgByteLength = dataInputStream.readInt();
+            byte[] msgBytes = new byte[msgByteLength];
+            dataInputStream.readFully(msgBytes, 0, msgBytes.length);
+            myFiles.remove(fileId);
+            String msg = new String(msgBytes);
+            System.out.println(msg);
+            deleteJpanel.setVisible(false);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void addIntoScrollPanel(MyFile file){
+
+        JPanel jpFileRow = new JPanel();
+        jpFileRow.setLayout(new BoxLayout(jpFileRow, BoxLayout.Y_AXIS));
+        jpFileRow.add(Box.createVerticalStrut(10));
+        // Set the file name.
+        JLabel jlFileName = new JLabel(file.getName());
+        jlFileName.setFont(new Font("Arial", Font.PLAIN, 20));
+
+        jlFileName.setBorder(new EmptyBorder(10,0, 10,0));
+//        jlFileName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        jlFileName.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+
+        jpFileRow.setName((String.valueOf(file.getId())));
+        jpFileRow.addMouseListener(getMyMouseListener());
+        // Add everything.
+        jpFileRow.add(jlFileName);
+        jPanel.add(jpFileRow);
+        jFrame.validate();
+    }
+
+    public static MouseListener getMyMouseListener() {
+        return new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Get the source of the click which is the JPanel.
+                JPanel jPanel = (JPanel) e.getSource();
+                deleteJpanel = jPanel;
+                // Get the ID of the file.
+                int fileId = Integer.parseInt(jPanel.getName());
+                // Loop through the file storage and see which file is the selected one.
+                for (MyFile myFile : myFiles) {
+                    if (myFile.getId() == fileId) {
+                        JFrame jfPreview = SecondScreen.createFrame(myFile.getId(), myFile.getName(), myFile.getData(), myFile.getFileExtension());
+                        jfPreview.setVisible(true);
+                    }
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                JPanel jPanel = (JPanel) e.getSource();
+                jPanel.setBackground(Color.gray);
+                 backgroundColor = jPanel.getBackground();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                JPanel jPanel = (JPanel) e.getSource();
+                jPanel.setBackground(Color.white);
+            }
+        };
+    }
+
+
+
+
+}
