@@ -35,6 +35,8 @@ public class Client {
     static JLabel jlFileName;
     static JFrame jFrame;
     static Color backgroundColor;
+    public static final JPopupMenu popupmenu = new JPopupMenu("Edit");
+    public static int selectedFileId;
 
 
     public static void main(String[] args) throws IOException, UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -59,6 +61,23 @@ public class Client {
          jScrollPane = new JScrollPane(jPanel);
         // Make it so there is always a vertical scrollbar.
         jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+
+
+
+        JMenuItem create = new JMenuItem("Download");
+        create.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+        JMenuItem delete = new JMenuItem("Delete");
+        delete.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+        create.addActionListener(new Listener());
+        delete.addActionListener(new Listener());
+
+        popupmenu.add(create);
+        popupmenu.add(delete);
 
 
 
@@ -200,13 +219,6 @@ public class Client {
 
         jFrame.add(jPanelConnection);
 
-
-        //jFrame.add(host);
-       // jFrame.add(Box.createVerticalStrut(10));
-        //jFrame.add(port);
-        //jFrame.add(Box.createVerticalStrut(10));
-        //jFrame.add(button);
-       // jFrame.add(Box.createVerticalStrut(10));
         jFrame.add(imgLabel);
         //jFrame.add(connected);
         jFrame.add(Box.createVerticalStrut(10));
@@ -244,10 +256,10 @@ public class Client {
             dataOutputStream.writeInt(fileId);
 
              DataInputStream dataInputStream = new DataInputStream(Client.inputStream);
-             int fileNameLenght = dataInputStream.readInt();
-            byte[] fileNameBytes = new byte[fileNameLenght];
-            dataInputStream.readFully(fileNameBytes, 0, fileNameBytes.length);
-            String fileName = new String(fileNameBytes);
+
+
+            Object object = objectInputStream.readObject();
+            String fileName = (String) object;
 
             System.out.println(fileName);
             int fileContentLength = dataInputStream.readInt();
@@ -265,6 +277,8 @@ public class Client {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -306,7 +320,20 @@ public class Client {
             int msgByteLength = dataInputStream.readInt();
             byte[] msgBytes = new byte[msgByteLength];
             dataInputStream.readFully(msgBytes, 0, msgBytes.length);
-            myFiles.remove(fileId);
+
+            MyFile deleteFile = null;
+                for(MyFile file: myFiles)
+                {
+                    if(file.getId() == selectedFileId)
+                    {
+                       deleteFile = file;
+                       break;
+                    }
+                }
+
+                myFiles.remove(deleteFile);
+
+
             String msg = new String(msgBytes);
             System.out.println(msg);
             deleteJpanel.setVisible(false);
@@ -322,6 +349,7 @@ public class Client {
         JPanel jpFileRow = new JPanel();
         jpFileRow.setLayout(new BoxLayout(jpFileRow, BoxLayout.Y_AXIS));
         jpFileRow.add(Box.createVerticalStrut(10));
+        jpFileRow.setBackground(Color.white);
         // Set the file name.
         JLabel jlFileName = new JLabel(file.getName());
         jlFileName.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -333,55 +361,14 @@ public class Client {
                 new EmptyBorder(new Insets(15, 25, 15, 25))));
 
         jpFileRow.setName((String.valueOf(file.getId())));
-        jpFileRow.addMouseListener(getMyMouseListener());
+        jpFileRow.addMouseListener(MyMouseListener.getMyMouseListener());
         // Add everything.
         jpFileRow.add(jlFileName);
         jPanel.add(jpFileRow);
         jFrame.validate();
     }
 
-    public static MouseListener getMyMouseListener() {
-        return new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // Get the source of the click which is the JPanel.
-                JPanel jPanel = (JPanel) e.getSource();
-                deleteJpanel = jPanel;
-                // Get the ID of the file.
-                int fileId = Integer.parseInt(jPanel.getName());
-                // Loop through the file storage and see which file is the selected one.
-                for (MyFile myFile : myFiles) {
-                    if (myFile.getId() == fileId) {
-                        JFrame jfPreview = SecondScreen.createFrame(myFile.getId(), myFile.getName(), myFile.getData(), myFile.getFileExtension());
-                        jfPreview.setVisible(true);
-                    }
-                }
-            }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                JPanel jPanel = (JPanel) e.getSource();
-                jPanel.setBackground(Color.gray);
-                 backgroundColor = jPanel.getBackground();
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                JPanel jPanel = (JPanel) e.getSource();
-                jPanel.setBackground(Color.white);
-            }
-        };
-    }
 
 
 

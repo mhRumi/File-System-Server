@@ -38,7 +38,7 @@ public class Listener implements ActionListener {
                 i++;
 
             }
-            System.out.println(directory);
+
             TreePath path = new TreePath(nodes);
             Main.m_tree.scrollPathToVisible(path);
 

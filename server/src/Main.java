@@ -50,6 +50,12 @@ public class Main extends JFrame {
         jPanel.setPreferredSize(new Dimension(50, 50));
         JMenuItem create = new JMenuItem("Create");
         JMenuItem delete = new JMenuItem("Delete");
+        create.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+        delete.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
         create.addActionListener(new Listener());
         delete.addActionListener(new Listener());
 

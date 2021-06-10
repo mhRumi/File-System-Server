@@ -5,6 +5,15 @@ public class MyFile implements Serializable {
     private String name;
     private byte[] data;
     private String fileExtension;
+    private String absolutePath;
+
+    public void setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
+    }
+
+    public String getAbsolutePath() {
+        return absolutePath;
+    }
 
     public int getId() {
         return id;
@@ -38,10 +47,11 @@ public class MyFile implements Serializable {
         this.fileExtension = fileExtension;
     }
 
-    public MyFile(int id, String name, byte[] data, String fileExtension) {
+    public MyFile(int id, String name, byte[] data, String fileExtension, String absolutePath) {
         this.id = id;
         this.name = name;
         //this.data = data;
         this.fileExtension = fileExtension;
+        this.absolutePath = absolutePath;
     }
 }

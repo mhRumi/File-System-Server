@@ -72,10 +72,9 @@ public class Server extends Thread implements Serializable {
                         fileOutputStream.write(fileContentBytes);
                         fileOutputStream.close();
 
-                        MyFile newFile = new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName));
+                        MyFile newFile = new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName), "/home/rumi/IdeaProjects/server/Uploads/"+fileName);
                         myFiles.add(newFile);
                         fileId++;
-                        printFileNames();
                         sendFileInformation(newFile);
                     }
                 }
@@ -85,13 +84,22 @@ public class Server extends Thread implements Serializable {
                 for(MyFile file: myFiles)
                 {
                     if(file.getId() == downloadFileId){
+                        File readFile = new File(file.getName());
+                        FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
+                        int fileLength = (int) readFile.length();
+                        byte[] fileContentBytes = new byte[fileLength];
+                        fileInputStream.read(fileContentBytes);
                         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
                         String fileName = file.getName();
-                        byte[] fileNameBytes = fileName.getBytes();
-                        dataOutputStream.writeInt(fileNameBytes.length);
-                        dataOutputStream.write(fileNameBytes);
-                        dataOutputStream.writeInt(file.getData().length);
-                        dataOutputStream.write(file.getData());
+
+                        objectOutputStream.writeObject(fileName);
+
+//                        byte[] fileNameBytes = fileName.getBytes();
+//                        dataOutputStream.writeInt(fileNameBytes.length);
+//                        dataOutputStream.write(fileNameBytes);
+
+                        dataOutputStream.writeInt(fileLength);
+                        dataOutputStream.write(fileContentBytes);
                     }
                 }
             }else if(operation.equalsIgnoreCase("delete")){
@@ -110,12 +118,11 @@ public class Server extends Thread implements Serializable {
                            dataOutputStream.write(msgBytes);
                             System.out.println(msg);
                         }
-                        myFiles.remove(deleteFileId);
+                        deleteFile(deleteFileId);
                         break;
                     }
                 }
 
-                printFileNames();
             }
 
         } catch (IOException e) {
@@ -137,7 +144,7 @@ public class Server extends Thread implements Serializable {
                 byte[] fileContentBytes = new byte[(int)file.length()];
                 fileInputStream.read(fileContentBytes);
 
-                MyFile newFile = new MyFile(fileId,fileName, fileContentBytes,getFileExtension(fileName));
+                MyFile newFile = new MyFile(fileId,fileName, fileContentBytes,getFileExtension(fileName), file.getAbsolutePath());
                 newFile.setData(fileContentBytes);
                 myFiles.add(newFile);
                 fileId++;
@@ -165,13 +172,7 @@ public class Server extends Thread implements Serializable {
         }
     }
 
-    public void printFileNames() throws IOException {
 
-        for(MyFile f: myFiles)
-        {
-            System.out.println(f.getId()+" "+f.getName());
-        }
-    }
 
     public void sendFileInformation(MyFile newFile) throws IOException {
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -182,5 +183,17 @@ public class Server extends Thread implements Serializable {
         objectOutputStream.writeObject(myFiles);
     }
 
+    public void deleteFile(int fileId){
+        MyFile deleteFile = null ;
+        for(MyFile file: myFiles)
+        {
+            if(file.getId() == fileId)
+            {
+               deleteFile = file;
+               break;
+            }
+        }
+        myFiles.remove(deleteFile);
+    }
 
 }

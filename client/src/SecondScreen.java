@@ -15,7 +15,7 @@ public class SecondScreen {
         // Frame to hold everything.
         JFrame jFrame = new JFrame("File System Server");
         // Set the size of the frame.
-        jFrame.setSize(500, 300);
+        jFrame.setSize(300, 200);
 
         // Panel to hold everything.
         JPanel jPanel = new JPanel();
@@ -40,16 +40,7 @@ public class SecondScreen {
         // Center the label horizontally.
         jlPrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Create the yes for accepting the download.
-        JButton downloadButon = new JButton("Download");
-        downloadButon.setPreferredSize(new Dimension(170, 50));
-        downloadButon.setBackground(Color.black);
-        downloadButon.setForeground(Color.green);
-        downloadButon.setBorder(BorderFactory.createCompoundBorder(
-                new CustomeBorder(Color.gray),
-                new EmptyBorder(new Insets(15, 25, 15, 25))));
-        // Set the font for the button.
-        downloadButon.setFont(new Font("Arial", Font.BOLD, 20));
+
 
         // No button for rejecting the download.
         JButton deleteButton = new JButton("Delete");
@@ -69,39 +60,14 @@ public class SecondScreen {
         // Add spacing around the panel.
         jpButtons.setBorder(new EmptyBorder(20, 0, 10, 0));
         // Add the yes and no buttons.
-        jpButtons.add(downloadButon);
         jpButtons.add(deleteButton);
 
 
-        // Yes so download file.
-        downloadButon.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Create the file with its name.
-//                File fileToDownload = new File(fileName);
-//                try {
-//                    // Create a stream to write data to the file.
-//                    FileOutputStream fileOutputStream = new FileOutputStream(fileToDownload);
-//                    // Write the actual file data to the file.
-//                    fileOutputStream.write(fileData);
-//                    // Close the stream.
-//                    fileOutputStream.close();
-//                    // Get rid of the jFrame. after the user clicked yes.
-//                    jFrame.dispose();
-//                } catch (IOException ex) {
-//                    ex.printStackTrace();
-//                }
-                Client.downloadFile(fileId);
-
-            }
-        });
 
         // No so close window.
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // User clicked no so don't download the file but close the jframe.
-                Client.deleteFile(fileId);
                 jFrame.dispose();
             }
         });
