@@ -49,7 +49,9 @@ public class Client {
         jPanelConnection = new JPanel();
         jPanelConnection.setLayout(new GridLayout(1, 3));
         jPanelConnection.setPreferredSize(new Dimension(10, 50));
-        jPanelConnection.setBorder(new EmptyBorder(1,10, 10,10));
+        jPanelConnection.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.gray),
+                new EmptyBorder(new Insets(1, 2, 1, 2))));
 
 
        jPanel = new JPanel();
@@ -67,11 +69,11 @@ public class Client {
 
         JMenuItem create = new JMenuItem("Download");
         create.setBorder(BorderFactory.createCompoundBorder(
-                new CustomeBorder(Color.gray),
+                new CustomeBorder(Color.black),
                 new EmptyBorder(new Insets(15, 25, 15, 25))));
         JMenuItem delete = new JMenuItem("Delete");
         delete.setBorder(BorderFactory.createCompoundBorder(
-                new CustomeBorder(Color.gray),
+                new CustomeBorder(Color.black),
                 new EmptyBorder(new Insets(15, 25, 15, 25))));
         create.addActionListener(new Listener());
         delete.addActionListener(new Listener());
@@ -120,11 +122,10 @@ public class Client {
 
 
         connected = new JLabel("Connected with server");
-        connected.setBackground(Color.green);
         connected.setFont(fieldFont);
         connected.setBounds(420,10,100,30);
         connected.setBorder(BorderFactory.createCompoundBorder(
-                new CustomeBorder(Color.gray),
+                new CustomeBorder(Color.darkGray),
                 new EmptyBorder(new Insets(15, 25, 15, 25))));
         connected.setVisible(false);
 
@@ -220,7 +221,7 @@ public class Client {
         jFrame.add(jPanelConnection);
 
         jFrame.add(imgLabel);
-        //jFrame.add(connected);
+        jFrame.add(connected);
         jFrame.add(Box.createVerticalStrut(10));
         jFrame.add(upload);
         jFrame.add(Box.createVerticalStrut(10));

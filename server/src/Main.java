@@ -40,7 +40,7 @@ public class Main extends JFrame {
         jLabel.setBackground(Color.white);
         jLabel.setForeground(Color.black.brighter());
         jLabel.setBorder(BorderFactory.createCompoundBorder(
-                new CustomeBorder(Color.gray),
+                new CustomeBorder(Color.darkGray),
                 new EmptyBorder(new Insets(15, 25, 15, 25))));
         jPanelButton.add(jLabel);
         jPanelButton.add(Box.createVerticalStrut(10));
