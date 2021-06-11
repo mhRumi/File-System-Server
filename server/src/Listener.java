@@ -51,49 +51,55 @@ public class Listener implements ActionListener {
             System.out.println("Delete");
             DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) Main.m_tree
                     .getLastSelectedPathComponent();
-            if (selNode == null) {
-                return;
-            }
-            MutableTreeNode parent = (MutableTreeNode) (selNode.getParent());
-            if (parent == null) {
-                return;
-            }
-            MutableTreeNode toBeSelNode = (MutableTreeNode) selNode.getPreviousSibling();
-            if (toBeSelNode == null) {
-                toBeSelNode = (MutableTreeNode) selNode.getNextSibling();
-            }
-            if (toBeSelNode == null) {
-                toBeSelNode = parent;
-            }
-            TreeNode[] nodes = Main.m_model.getPathToRoot(toBeSelNode);
+            deleteNode(selNode);
 
-            String directory = "";
-            int i = 1;
-            for(TreeNode node:nodes){
-                if(i == 1 )
-                {
-                    directory += node+"Uploads/";
-                }else if(i != nodes.length){
-                    directory += node+"/";
-                }
-                i++;
-
-            }
-            File index = new File(directory+selNode);
-            System.out.println(directory+selNode);
-            String[]entries = index.list();
-            if(index.isDirectory()){
-                for(String s: entries){
-                    File currentFile = new File(index.getPath(),s);
-                    currentFile.delete();
-                }
-            }
-            index.delete();
-
-            TreePath path = new TreePath(nodes);
-            Main.m_tree.scrollPathToVisible(path);
-            Main.m_tree.setSelectionPath(path);
-            Main.m_model.removeNodeFromParent(selNode);
         }
+    }
+
+    public static void deleteNode(DefaultMutableTreeNode selNode){
+
+        if (selNode == null) {
+            return;
+        }
+        MutableTreeNode parent = (MutableTreeNode) (selNode.getParent());
+        if (parent == null) {
+            return;
+        }
+        MutableTreeNode toBeSelNode = (MutableTreeNode) selNode.getPreviousSibling();
+        if (toBeSelNode == null) {
+            toBeSelNode = (MutableTreeNode) selNode.getNextSibling();
+        }
+        if (toBeSelNode == null) {
+            toBeSelNode = parent;
+        }
+        TreeNode[] nodes = Main.m_model.getPathToRoot(toBeSelNode);
+
+        String directory = "";
+        int i = 1;
+        for(TreeNode node:nodes){
+            if(i == 1 )
+            {
+                directory += node+"Uploads/";
+            }else if(i != nodes.length){
+                directory += node+"/";
+            }
+            i++;
+
+        }
+        File index = new File(directory+selNode);
+        System.out.println(directory+selNode);
+        String[]entries = index.list();
+        if(index.isDirectory()){
+            for(String s: entries){
+                File currentFile = new File(index.getPath(),s);
+                currentFile.delete();
+            }
+        }
+        index.delete();
+
+        TreePath path = new TreePath(nodes);
+        Main.m_tree.scrollPathToVisible(path);
+        Main.m_tree.setSelectionPath(path);
+        Main.m_model.removeNodeFromParent(selNode);
     }
 }

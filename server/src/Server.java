@@ -17,6 +17,7 @@ public class Server extends Thread implements Serializable {
     File folder = new File("./Uploads/");
     File[] listOfFiles = folder.listFiles();
     String fileNames = "";
+
     Server(){
 
         try {
@@ -76,6 +77,8 @@ public class Server extends Thread implements Serializable {
                         myFiles.add(newFile);
                         fileId++;
                         sendFileInformation(newFile);
+
+                        Main.main.addingSingleFile(fileName);
                     }
                 }
             }else if(operation.equalsIgnoreCase("download")){
@@ -94,23 +97,20 @@ public class Server extends Thread implements Serializable {
 
                         objectOutputStream.writeObject(fileName);
 
-//                        byte[] fileNameBytes = fileName.getBytes();
-//                        dataOutputStream.writeInt(fileNameBytes.length);
-//                        dataOutputStream.write(fileNameBytes);
-
                         dataOutputStream.writeInt(fileLength);
                         dataOutputStream.write(fileContentBytes);
                     }
                 }
             }else if(operation.equalsIgnoreCase("delete")){
                 int deleteFileId = dataInputStream.readInt();
-
+                String filename = "";
                 for(MyFile file: myFiles)
                 {
                     if(file.getId() == deleteFileId){
                         File f = new File("Uploads/"+file.getName());
                         if(f.delete())                      //returns Boolean value
                         {
+                            filename = f.getName();
                            String msg = "File "+ file.getName()+" is successfully deleted";
                            byte[] msgBytes = msg.getBytes();
                            DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
@@ -122,6 +122,8 @@ public class Server extends Thread implements Serializable {
                         break;
                     }
                 }
+
+                Main.main.deleteSingleNode(filename);
 
             }
 
@@ -142,7 +144,10 @@ public class Server extends Thread implements Serializable {
                 FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
                 String fileName = file.getName();
                 byte[] fileContentBytes = new byte[(int)file.length()];
-                fileInputStream.read(fileContentBytes);
+                if((int) file.length() > 0)
+                {
+                    fileInputStream.read(fileContentBytes);
+                }
 
                 MyFile newFile = new MyFile(fileId,fileName, fileContentBytes,getFileExtension(fileName), file.getAbsolutePath());
                 newFile.setData(fileContentBytes);
