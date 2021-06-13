@@ -19,9 +19,8 @@ public class Client {
     static JPanel jPanelConnection;
     static JPanel deleteJpanel;
     static JPanel jPanelUpload;
-    Button[] buttons;
-    static JButton showFileButton;
     static JFrame jFrame2nd;
+    static JDialog dialog;
 
     static ArrayList<MyFile> myFiles = new ArrayList<>();
     static Socket socket = null;
@@ -40,8 +39,8 @@ public class Client {
 
 
     public static void main(String[] args) throws IOException, UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-
         jFrame = new JFrame("Client");
+        dialog = new JDialog(jFrame,"Alert", Dialog.ModalityType.APPLICATION_MODAL);
         jFrame.setSize(500, 800);
         jFrame.setLayout(new BoxLayout(jFrame.getContentPane(), BoxLayout.Y_AXIS));
        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -143,10 +142,16 @@ public class Client {
             public void actionPerformed(ActionEvent actionEvent) {
                 _hide();
                 try {
-                    socket = new Socket(host.getText(), Integer.parseInt(port.getText()));
+                    String hostIp = host.getText();
+                    int portN = Integer.parseInt(port.getText());
+                    socket = new Socket(hostIp, portN);
                     Client.outputStream = socket.getOutputStream();
                     Client.inputStream = socket.getInputStream();
-                    getFileInfo();
+                    if(socket.isConnected()){
+                        getFileInfo();
+                    }else{
+                        System.out.println("Can't connect with server");
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
@@ -185,21 +190,20 @@ public class Client {
                             FileInputStream fileInputStream = new FileInputStream(fileToSend[0].getAbsolutePath());
                              dataOutputStream = new DataOutputStream(Client.outputStream);
                             String fileName = fileToSend[0].getName();
-                            byte[] fileNameBytes = fileName.getBytes();
                             byte[] fileBytes = new byte[(int)fileToSend[0].length()];
+
+                            ObjectOutputStream objectOutputStream = new ObjectOutputStream(Client.outputStream);
                             String op = new String("upload");
-                            byte[] operation  = op.getBytes();
-                            fileInputStream.read(fileBytes);
 
-                            dataOutputStream.writeInt(operation.length);
-                            dataOutputStream.write(operation);
+                            fileInputStream.read(fileBytes); // read file from file system
 
-                            dataOutputStream.writeInt(fileNameBytes.length);
-                            dataOutputStream.write(fileNameBytes);
+                            objectOutputStream.writeObject(op); // sending operation
+                            objectOutputStream.writeObject(fileName); // sending file name
+
                             dataOutputStream.writeInt(fileBytes.length);
                             dataOutputStream.write(fileBytes);
-
                             getSingleElement();
+                            JOptionPane.showMessageDialog(jFrame, "Upload complete", "About", JOptionPane.INFORMATION_MESSAGE);
 
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
@@ -247,18 +251,13 @@ public class Client {
 
     static public void downloadFile(int fileId){
         try {
-             dataOutputStream = new DataOutputStream(Client.outputStream);
+            dataOutputStream = new DataOutputStream(Client.outputStream);
             String op = new String("download");
-            byte[] operation  = op.getBytes();
-
-            dataOutputStream.writeInt(operation.length);
-            dataOutputStream.write(operation);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(Client.outputStream);
+            objectOutputStream.writeObject(op);
 
             dataOutputStream.writeInt(fileId);
-
-             DataInputStream dataInputStream = new DataInputStream(Client.inputStream);
-
-
+            DataInputStream dataInputStream = new DataInputStream(Client.inputStream);
             Object object = objectInputStream.readObject();
             String fileName = (String) object;
 
@@ -267,14 +266,13 @@ public class Client {
             byte[] fileContentBytes = new byte[fileContentLength];
             dataInputStream.readFully(fileContentBytes, 0, fileContentBytes.length);
 
-
             // Write file to a file
             File file = new File(fileName);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             fileOutputStream.write(fileContentBytes);
             fileOutputStream.close();
 
-            //  }
+            JOptionPane.showMessageDialog(jFrame, "Download complete", "About", JOptionPane.INFORMATION_MESSAGE);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -282,6 +280,42 @@ public class Client {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    static public void deleteFile(int fileId)
+    {
+        try {
+            dataOutputStream = new DataOutputStream(Client.outputStream);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(Client.outputStream);
+            String op = new String("delete");
+            objectOutputStream.writeObject(op);
+
+            dataOutputStream.writeInt(fileId); // sending file id
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+            String message = (String) objectInputStream.readObject(); // receiveing message
+            System.out.println(message);
+            deleteJpanel.setVisible(false);
+            JOptionPane.showMessageDialog(jFrame, "Successfully deleted", "Acknowledgement", JOptionPane.INFORMATION_MESSAGE);
+
+            //deleteing from front-end
+
+            MyFile deleteFile = null;
+            for(MyFile file: myFiles)
+            {
+                if(file.getId() == selectedFileId)
+                {
+                    deleteFile = file;
+                    break;
+                }
+            }
+            myFiles.remove(deleteFile);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void getSingleElement() throws IOException, ClassNotFoundException {
@@ -307,43 +341,7 @@ public class Client {
         }
     }
 
-    static public void deleteFile(int fileId)
-    {
-        try {
-            dataOutputStream = new DataOutputStream(Client.outputStream);
-            String op = new String("delete");
-            byte[] operation  = op.getBytes();
-            dataOutputStream.writeInt(operation.length);
-            dataOutputStream.write(operation);
 
-            dataOutputStream.writeInt(fileId);
-            DataInputStream dataInputStream = new DataInputStream(inputStream);
-            int msgByteLength = dataInputStream.readInt();
-            byte[] msgBytes = new byte[msgByteLength];
-            dataInputStream.readFully(msgBytes, 0, msgBytes.length);
-
-            MyFile deleteFile = null;
-                for(MyFile file: myFiles)
-                {
-                    if(file.getId() == selectedFileId)
-                    {
-                       deleteFile = file;
-                       break;
-                    }
-                }
-
-                myFiles.remove(deleteFile);
-
-
-            String msg = new String(msgBytes);
-            System.out.println(msg);
-            deleteJpanel.setVisible(false);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public static void addIntoScrollPanel(MyFile file){
 
@@ -368,10 +366,4 @@ public class Client {
         jPanel.add(jpFileRow);
         jFrame.validate();
     }
-
-
-
-
-
-
 }

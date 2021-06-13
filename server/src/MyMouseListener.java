@@ -7,10 +7,6 @@ public class MyMouseListener {
         return new java.awt.event.MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) Main.m_tree
-                        .getLastSelectedPathComponent();
-                System.out.println(selNode);
-
 
                 if (SwingUtilities.isRightMouseButton(e)) {
 
@@ -33,7 +29,6 @@ public class MyMouseListener {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-
             }
 
             @Override

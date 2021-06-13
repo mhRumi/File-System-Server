@@ -11,7 +11,10 @@ public class Listener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equalsIgnoreCase("Download")){
             Client.downloadFile(Client.selectedFileId);
-        }else{
+        }else if(e.getActionCommand().equalsIgnoreCase("Ok")){
+            Client.dialog.dispose();
+        }
+        else if(e.getActionCommand().equalsIgnoreCase("Delete")){
             Client.deleteFile(Client.selectedFileId);
         }
     }

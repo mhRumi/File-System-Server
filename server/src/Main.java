@@ -1,5 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.io.File;
@@ -18,10 +20,11 @@ public class Main extends JFrame {
     public static MyMouseListener mouseListener = new MyMouseListener();
     public static Main main;
     public static JScrollPane scrollPane;
+    static JDialog dialog;
 
 
     public Main(String directory) {
-
+         dialog = new JDialog(this,"Alert", Dialog.ModalityType.APPLICATION_MODAL);
         nodeInit(directory);
 
         jPanelButton= new JPanel();
@@ -57,7 +60,9 @@ public class Main extends JFrame {
 
         setSize(500, 600);
         setVisible(true);
+
     }
+
 
 
     public void nodeInit(String directory)
@@ -67,6 +72,20 @@ public class Main extends JFrame {
         m_tree.setEditable(true);
         m_tree.setSelectionRow(0);
         m_tree.setRowHeight(25);
+        m_tree.getCellEditor().addCellEditorListener(new CellEditorListener() {
+            @Override
+            public void editingStopped(ChangeEvent e) {
+                String filename = (String)  m_tree.getCellEditor().getCellEditorValue();
+                String fileExtension = Server.getFileExtension(filename);
+
+                Listener.createFile(Listener.directory+filename, fileExtension);
+            }
+
+            @Override
+            public void editingCanceled(ChangeEvent e) {
+            }
+        });
+
 
         m_tree.addMouseListener(mouseListener.getMyMouseListener());
 
@@ -75,6 +94,7 @@ public class Main extends JFrame {
         getContentPane().add(scrollPane, BorderLayout.CENTER);
         addingToNode("./Uploads", rootNode);
     }
+
 
 
     public  void addingToNode(String directory, DefaultMutableTreeNode rootNode)
@@ -97,24 +117,28 @@ public class Main extends JFrame {
         }
     }
 
-    public void addingSingleFile(String directory)
+    public void addingSingleNode(String directory)
     {
         File file = new File(directory);
         System.out.println("Adding file name "+ file.getName());
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(file.getName());
         Main.m_model.insertNodeInto(newNode, rootNode, rootNode.getChildCount());
+        //nodeInit("./");
+
     }
 
     public void deleteSingleNode(String fileName){
-        DefaultMutableTreeNode deleteNode = rootNode.getNextNode();
-        String node = deleteNode.toString();
-        if(node.equalsIgnoreCase(fileName))
+        int childCount = rootNode.getChildCount();
+        for(int i=0; i<childCount; i++)
         {
-            System.out.println(node);
-            Listener.deleteNode(deleteNode);
-            return;
+            DefaultMutableTreeNode deleteNode = (DefaultMutableTreeNode) rootNode.getChildAt(i);
+            String node = deleteNode.toString();
+            if(fileName.equalsIgnoreCase(node))
+            {
+                Listener.deleteNode(deleteNode);
+                break;
+            }
         }
-        deleteSingleNode(fileName);
     }
 
 
