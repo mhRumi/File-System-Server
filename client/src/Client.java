@@ -117,7 +117,7 @@ public class Client {
         imgLabel = new JLabel();
         imgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         imgLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        imgLabel.setIcon(new ImageIcon("/home/rumi/Downloads/image1.jpg"));
+        imgLabel.setIcon(new ImageIcon("/home/rumi/Downloads/cs.jpg"));
 
 
         connected = new JLabel("Connected with server");
@@ -353,11 +353,10 @@ public class Client {
         JLabel jlFileName = new JLabel(file.getName());
         jlFileName.setFont(new Font("Arial", Font.PLAIN, 20));
 
-        jlFileName.setBorder(new EmptyBorder(10,0, 10,0));
+        jlFileName.setBorder(new EmptyBorder(0,10, 5,0));
 //        jlFileName.setAlignmentX(Component.CENTER_ALIGNMENT);
-        jlFileName.setBorder(BorderFactory.createCompoundBorder(
-                new CustomeBorder(Color.gray),
-                new EmptyBorder(new Insets(15, 25, 15, 25))));
+        jlFileName.setAlignmentY(Component.CENTER_ALIGNMENT);
+
 
         jpFileRow.setName((String.valueOf(file.getId())));
         jpFileRow.addMouseListener(MyMouseListener.getMyMouseListener());

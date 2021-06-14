@@ -52,5 +52,6 @@ public class MyFile implements Serializable {
         this.name = name;
         //this.data = data;
         this.fileExtension = fileExtension;
+        this.absolutePath = absolutePath;
     }
 }

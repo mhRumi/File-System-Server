@@ -36,7 +36,7 @@ public class MyMouseListener {
             @Override
             public void mouseEntered(MouseEvent e) {
                 JPanel jPanel = (JPanel) e.getSource();
-                jPanel.setBackground(Color.lightGray);
+                jPanel.setBackground(new Color(51,150,255 ));
                 Client.backgroundColor = jPanel.getBackground();
             }
 
