@@ -20,7 +20,7 @@ public class MyMouseListener {
                     }
                 }
 
-                Client.popupmenu.show(e.getComponent() , e.getX(), e.getY());
+                ClientInterface.popupmenu.show(e.getComponent() , e.getX(), e.getY());
             }
 
             @Override
@@ -37,7 +37,6 @@ public class MyMouseListener {
             public void mouseEntered(MouseEvent e) {
                 JPanel jPanel = (JPanel) e.getSource();
                 jPanel.setBackground(new Color(51,150,255 ));
-                Client.backgroundColor = jPanel.getBackground();
             }
 
             @Override
