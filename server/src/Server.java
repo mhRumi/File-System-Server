@@ -68,7 +68,7 @@ public class Server extends Thread implements Serializable {
                         fileOutputStream.write(fileContentBytes);
                         fileOutputStream.close();
 
-                        MyFile newFile = new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName), "/home/rumi/IdeaProjects/File-System-Server/server/Uploads/"+fileName);
+                        MyFile newFile = new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName), "/home/rumi/IdeaProjects/File-System-Server/server/./Uploads/"+fileName);
                         myFiles.add(newFile);
                         fileId++;
                         sendFileInformation(newFile);
@@ -83,19 +83,11 @@ public class Server extends Thread implements Serializable {
                 {
                     if(file.getId() == downloadFileId){
                         File readFile = new File(file.getName());
-                        FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
-                        int fileLength = (int) readFile.length();
-                        byte[] fileContentBytes = new byte[fileLength];
-                        fileInputStream.read(fileContentBytes);
-                        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-                        String fileName = file.getName();
-
-                        objectOutputStream.writeObject(fileName);
-
-                        dataOutputStream.writeInt(fileLength);
-                        dataOutputStream.write(fileContentBytes);
+                        sendFileToClient(readFile.getName());
                     }
                 }
+
+
             }else if(operation.equalsIgnoreCase("delete")){
                 int deleteFileId = dataInputStream.readInt();
                 String filename = "";
@@ -136,6 +128,7 @@ public class Server extends Thread implements Serializable {
     }
 
     void fileNames() throws IOException {
+        listOfFiles = folder.listFiles();
         for(File file: listOfFiles){
             try {
                 FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
@@ -145,7 +138,7 @@ public class Server extends Thread implements Serializable {
                 {
                     fileInputStream.read(fileContentBytes);
                 }
-
+                System.out.println(file.getAbsolutePath());
                 MyFile newFile = new MyFile(fileId,fileName, fileContentBytes,getFileExtension(fileName), file.getAbsolutePath());
                 newFile.setData(fileContentBytes);
                 myFiles.add(newFile);
@@ -195,6 +188,36 @@ public class Server extends Thread implements Serializable {
             }
         }
         myFiles.remove(deleteFile);
+    }
+
+
+    public  void sendFileToClient(String filename) throws IOException {
+        listOfFiles = folder.listFiles();
+        for(File file: listOfFiles) {
+            if (file.getName().equalsIgnoreCase(filename))
+            {
+                try {
+                    FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
+                    byte[] fileContentBytes = new byte[(int) file.length()];
+                    if ((int) file.length() > 0) {
+                        fileInputStream.read(fileContentBytes);
+                    }
+                    DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+                    String fileName = file.getName();
+
+                    objectOutputStream.writeObject(fileName);
+
+                    dataOutputStream.writeInt(fileContentBytes.length);
+                    dataOutputStream.write(fileContentBytes);
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+        }
+
     }
 
 }
