@@ -14,6 +14,8 @@ public class ClientInterface {
     static JButton connectButton;
     static JTextField showFileName;
     static JButton closeButton;
+    static JButton chooseFileButton;
+    static JButton uploadButton;
     JFrame f;
     ClientInterface(){
         frame=new JFrame();
@@ -51,7 +53,7 @@ public class ClientInterface {
         closeButton.setEnabled(false);
 
 
-        JButton chooseFileButton = new JButton("choose");
+        chooseFileButton = new JButton("choose");
         chooseFileButton.setBackground(Color.black);
         chooseFileButton.setForeground(Color.white);
         chooseFileButton.setFont(bFont);
@@ -59,11 +61,13 @@ public class ClientInterface {
         chooseFileButton.setBorder(BorderFactory.createCompoundBorder(
                 new CustomeBorder(Color.WHITE),
                 new EmptyBorder(new Insets(15, 30, 15, 30))));
+        chooseFileButton.setEnabled(false);
 
-        JButton uploadButton = new JButton("upload");
+        uploadButton = new JButton("upload");
         uploadButton.setBackground(Color.black);
         uploadButton.setForeground(Color.white);
         uploadButton.setFont(bFont);
+        uploadButton.setEnabled(false);
 
         uploadButton.setBorder(BorderFactory.createCompoundBorder(
                 new CustomeBorder(Color.WHITE),

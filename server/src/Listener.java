@@ -58,6 +58,8 @@ public class Listener implements ActionListener {
         } else if (e.getActionCommand().equalsIgnoreCase("Ok")) {
             Main.dialog.dispose();
         }
+        else if (e.getActionCommand().equalsIgnoreCase("start")) {
+        }
     }
 
 

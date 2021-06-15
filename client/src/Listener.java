@@ -24,6 +24,8 @@ public class Listener implements ActionListener {
             new Client(ClientInterface.host.getText(), Integer.parseInt( ClientInterface.port.getText()));
             ClientInterface.connectButton.setEnabled(false);
             ClientInterface.closeButton.setEnabled(true);
+            ClientInterface.chooseFileButton.setEnabled(true);
+            ClientInterface.uploadButton.setEnabled(true);
 
 
         }

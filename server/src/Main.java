@@ -28,6 +28,7 @@ public class Main extends JFrame {
         nodeInit(directory);
 
         jPanelButton= new JPanel();
+        jPanelButton.setLayout(new FlowLayout(10, 100, 10));
         jPanelButton.setPreferredSize(new Dimension(50, 70));
         JLabel jLabel = new JLabel("File System Server");
         Font fieldFont = new Font("Arial", Font.BOLD, 20);
@@ -39,10 +40,22 @@ public class Main extends JFrame {
                 new EmptyBorder(new Insets(15, 25, 15, 25))));
         jPanelButton.add(jLabel);
         jPanelButton.add(Box.createVerticalStrut(10));
+        jPanelButton.add(jLabel);
         getContentPane().add(jPanelButton, BorderLayout.NORTH);
 
+        JLabel waiting = new JLabel("listening");
+        waiting.setBackground(Color.white);
+        waiting.setForeground(Color.black);
+        Font wt = new Font("Arial", Font.PLAIN, 20);
+        waiting.setFont(wt);
+        waiting.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(Color.BLACK),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+
+
+
         JPanel jPanel = new JPanel();
-        jPanel.setPreferredSize(new Dimension(50, 50));
+        jPanel.setPreferredSize(new Dimension(150, 50));
         JMenuItem create = new JMenuItem("Create");
         JMenuItem delete = new JMenuItem("Delete");
         create.setBorder(BorderFactory.createCompoundBorder(
@@ -56,9 +69,10 @@ public class Main extends JFrame {
 
         popupmenu.add(create);
         popupmenu.add(delete);
+        jPanel.add(waiting);
         getContentPane().add(jPanel, BorderLayout.WEST);
 
-        setSize(500, 600);
+        setSize(500, 700);
         setVisible(true);
 
     }
@@ -145,7 +159,7 @@ public class Main extends JFrame {
     public static void main(String[] arg) {
          main =  new Main("./");
         Server server = new Server();
-        server.start();;
+        server.start();
     }
 
 }
