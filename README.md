@@ -1,7 +1,3 @@
-<h1>Md. Mehedi Hasan </h1> 
-<h3> Reg no: 2017831023<h3>
-<h1>Dipanker Bala</h1> 
- <h3>Reg no: 2017831047</h3>
 
 # File-System-Server
 
