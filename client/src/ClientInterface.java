@@ -97,7 +97,7 @@ public class ClientInterface {
         // top panel design
 
         host = new JTextField();
-        host.setPreferredSize(new Dimension(130, 50));
+        host.setPreferredSize(new Dimension(200, 50));
         host.setText("localhost");
         host.setToolTipText("Enter host IP");
 
