@@ -1,3 +1,8 @@
+<h1>Md. Mehedi Hasan </h1> 
+<h3> Reg no: 2017831023<h3>
+<h1>Dipanker Bala</h1> 
+ <h3>Reg no: 2017831047</h3>
+
 # File-System-Server
 
 The project is about sharing file between two devices using socket. Here one device is Client and another device is Server. At first start the Server program then it Start ServerSocket and start listening on port 6000(you can change form code). Then Client program should be run , Client socket connect with ServerSocket by ServerSocket's Ip address and Port number on which port it's listening.
