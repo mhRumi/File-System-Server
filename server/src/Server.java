@@ -43,7 +43,7 @@ public class Server extends Thread implements Serializable {
 
         while (true){
 
-
+            System.out.println(socket.isClosed());
             // Receiving file from client
             inputStream = socket.getInputStream();
 
@@ -110,6 +110,11 @@ public class Server extends Thread implements Serializable {
 
                 Main.main.deleteSingleNode(filename);
 
+            }else if(operation.equalsIgnoreCase("close")){
+                socket.close();
+                serverSocket.close();
+                Server server = new Server();
+                server.start();
             }
 
         }
@@ -122,10 +127,6 @@ public class Server extends Thread implements Serializable {
         }
     }
 
-    void shutdown() throws IOException {
-        socket.close();
-        serverSocket.close();
-    }
 
     void fileNames() throws IOException {
         listOfFiles = folder.listFiles();
@@ -138,7 +139,7 @@ public class Server extends Thread implements Serializable {
                 {
                     fileInputStream.read(fileContentBytes);
                 }
-                System.out.println(file.getAbsolutePath());
+
                 MyFile newFile = new MyFile(fileId,fileName, fileContentBytes,getFileExtension(fileName), file.getAbsolutePath());
                 newFile.setData(fileContentBytes);
                 myFiles.add(newFile);

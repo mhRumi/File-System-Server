@@ -21,6 +21,7 @@ public class Main extends JFrame {
     public static Main main;
     public static JScrollPane scrollPane;
     static JDialog dialog;
+    static Server server;
 
 
     public Main(String directory) {
@@ -75,6 +76,11 @@ public class Main extends JFrame {
         setSize(500, 700);
         setVisible(true);
 
+    }
+
+    public static void closeScreen()
+    {
+        main.dispose();;
     }
 
 
@@ -158,7 +164,7 @@ public class Main extends JFrame {
 
     public static void main(String[] arg) {
          main =  new Main("./");
-        Server server = new Server();
+         server = new Server();
         server.start();
     }
 

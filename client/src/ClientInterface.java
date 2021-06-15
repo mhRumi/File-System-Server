@@ -77,6 +77,7 @@ public class ClientInterface {
         connectButton.addActionListener(new Listener());
         chooseFileButton.addActionListener(new Listener());
         uploadButton.addActionListener(new Listener());
+        closeButton.addActionListener(new Listener());
 
         // pop up menu
 
@@ -159,10 +160,6 @@ public class ClientInterface {
         new ClientInterface();
     }
 
-    public static void shutDown()
-    {
-        exit(0);
-    }
 
     public static void addIntoScrollPanel(JPanel jPanel, JFrame f, ArrayList<String> list){
 
