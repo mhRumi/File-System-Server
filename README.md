@@ -20,3 +20,12 @@ After connection Client can upload file to Server, download from Server, delete 
 # Server Program image
 ![alt text](./images/server.png)
 
+# How to run programs
+
+1. need to install JavaFx
+
+# Client configuration( Intelij setup)
+![alt text](./images/clientConfugaration.png)
+
+# Server configuration (Intelij setup)
+![alt text](./images/serverConfig.png)
