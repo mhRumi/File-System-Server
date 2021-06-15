@@ -6,3 +6,17 @@ socket connect with ServerSocket by ServerSocket's Ip address and Port number on
 
 After connection Client can upload file to Server, download from Server, delete file from server by presssing buttons.
 
+# Client program images
+
+# First view after starting Client program
+![alt text](./images/clientFirst.png)
+
+# Second view after connecting with Server
+![alt text](./images/afterConnection.png)
+
+# Onclick Pop Up menu
+![alt text](./images/clientPopup.png)
+
+# Server Program image
+![alt text](./images/server.png)
+
