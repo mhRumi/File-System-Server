@@ -16,11 +16,15 @@ public class Listener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equalsIgnoreCase("Download")){
             Client.downloadFile(Client.selectedFileId);
-        }else if(e.getActionCommand().equalsIgnoreCase("Ok")){
-            Client.dialog.dispose();
+        }else if(e.getActionCommand().equalsIgnoreCase("yes")){
+            ShowDialog.closeFrame();
+            Client.deleteFile(Client.selectedFileId);
+        }
+        else if(e.getActionCommand().equalsIgnoreCase("no")){
+            ShowDialog.closeFrame();
         }
         else if(e.getActionCommand().equalsIgnoreCase("Delete")){
-            Client.deleteFile(Client.selectedFileId);
+            ShowDialog.showDialog("Permanently delete this file?");
         }else if(e.getActionCommand().equalsIgnoreCase("connect")){
             startClient();
         }
@@ -38,8 +42,7 @@ public class Listener implements ActionListener {
                 ClientInterface.connectButton.setEnabled(true);
                 ClientInterface.closeButton.setEnabled(false);
                 JOptionPane.showMessageDialog(ClientInterface.frame, "Connection close","Acknowledgement", JOptionPane.INFORMATION_MESSAGE);
-                ClientInterface.frame.dispose();
-                new ClientInterface();
+                System.exit(0);
 
             } catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -49,7 +52,7 @@ public class Listener implements ActionListener {
 
     public void startClient()
     {
-        new Client(ClientInterface.host.getText(), Integer.parseInt( ClientInterface.port.getText()));
+        ClientInterface.client = new Client(ClientInterface.host.getText(), Integer.parseInt( ClientInterface.port.getText()));
         ClientInterface.connectButton.setEnabled(false);
         ClientInterface.closeButton.setEnabled(true);
         ClientInterface.chooseFileButton.setEnabled(true);

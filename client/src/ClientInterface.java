@@ -16,10 +16,13 @@ public class ClientInterface {
     static JButton closeButton;
     static JButton chooseFileButton;
     static JButton uploadButton;
+    static JScrollPane jScrollPane;
+    static JDialog dialog;
     JFrame f;
+    static Client client;
     ClientInterface(){
         frame=new JFrame();
-
+        dialog = new JDialog(frame,"Alert", Dialog.ModalityType.APPLICATION_MODAL);
         JPanel topPanel=new JPanel();
         topPanel.setPreferredSize(new Dimension(1, 100));
         topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -139,7 +142,7 @@ public class ClientInterface {
         topPanel.add(showFileName, FlowLayout.RIGHT);
         //topPanel.add(connectButton, FlowLayout.RIGHT);
 
-        JScrollPane jScrollPane = new JScrollPane(center);
+        jScrollPane = new JScrollPane(center);
         jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         //addding to left panel

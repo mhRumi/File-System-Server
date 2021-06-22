@@ -25,12 +25,7 @@ public class Client {
     static InputStream inputStream = null;
     static OutputStream outputStream = null;
     static DataOutputStream dataOutputStream = null;
-    static ObjectOutputStream objectOutputStream;
     static ObjectInputStream objectInputStream;
-    static JScrollPane jScrollPane;
-    static JPanel jpFileRow;
-    static JLabel jlFileName;
-    static JPanel jPanelcenter;
     static JFrame jFrame;
     static JFileChooser fileChooser;
 
@@ -178,13 +173,13 @@ public class Client {
     }
 
     public static void getFileInfo() throws IOException, ClassNotFoundException {
-        myFiles = null;
         objectInputStream = new ObjectInputStream(Client.inputStream);
         Object object = objectInputStream.readObject();
         myFiles = (ArrayList<MyFile>) object;
 
         for (MyFile file : myFiles) {
            addIntoScrollPanel(file);
+            System.out.println(file.getName());
 
         }
     }

@@ -29,7 +29,7 @@ public class ShowDialog {
         button.addActionListener(new Listener());
 
 
-        Main.dialog.setBounds(150, 300, 400, 200);
+        Main.dialog.setBounds(150, 300, 500, 200);
         Main.dialog.add(Box.createVerticalStrut(30));
         Main.dialog.add(message);
         Main.dialog.add(Box.createVerticalStrut(20));

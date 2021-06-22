@@ -41,7 +41,7 @@ public class Server extends Thread implements Serializable {
 
         try {
 
-        while (true){
+        while (true && !socket.isClosed()){
 
             System.out.println(socket.isClosed());
             // Receiving file from client
@@ -125,10 +125,14 @@ public class Server extends Thread implements Serializable {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
     void fileNames() throws IOException {
+        myFiles.clear();
         listOfFiles = folder.listFiles();
         for(File file: listOfFiles){
             try {
