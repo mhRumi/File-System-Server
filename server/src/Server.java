@@ -10,6 +10,7 @@ public class Server extends Thread implements Serializable {
     int fileId = 0;
     ServerSocket serverSocket;
     ObjectOutputStream objectOutputStream;
+    ObjectInputStream objectInputStream;
     OutputStream outputStream;
     InputStream inputStream;
     Socket socket;
@@ -17,12 +18,22 @@ public class Server extends Thread implements Serializable {
     File folder = new File("./Uploads/");
     File[] listOfFiles = folder.listFiles();
     String fileNames = "";
+    int port;
 
-    Server(){
-
+    Server(int port){
+        this.port = port;
         try {
             fileNames();
-            serverSocket = new ServerSocket(6000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void run() {
+
+        try {
+
+            serverSocket = new ServerSocket(port);
             socket = serverSocket.accept();
 
             outputStream = socket.getOutputStream();
@@ -30,31 +41,24 @@ public class Server extends Thread implements Serializable {
 
             // sending file informations to client
             objectOutputStream = new ObjectOutputStream(outputStream);
+            objectInputStream = new ObjectInputStream(inputStream);
             sendAllFiles();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
-    public void run() {
+            while (true && !socket.isClosed()){
 
-        try {
+                System.out.println(socket.isClosed());
+                // Receiving file from client
+                inputStream = socket.getInputStream();
 
-        while (true && !socket.isClosed()){
+                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                String operation = (String) objectInputStream.readObject();
 
-            System.out.println(socket.isClosed());
-            // Receiving file from client
-            inputStream = socket.getInputStream();
+                DataInputStream dataInputStream = new DataInputStream(inputStream);
 
-            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            String operation = (String) objectInputStream.readObject();
-
-            DataInputStream dataInputStream = new DataInputStream(inputStream);
-
-            if(operation.equalsIgnoreCase("upload")){
-                System.out.println(operation);
-                String fileName = (String) objectInputStream.readObject();
+                if(operation.equalsIgnoreCase("upload")){
+                    System.out.println(operation);
+                    String fileName = (String) objectInputStream.readObject();
 
                     int fileContentLength = dataInputStream.readInt();
                     if(fileContentLength > 0 )
@@ -68,7 +72,7 @@ public class Server extends Thread implements Serializable {
                         fileOutputStream.write(fileContentBytes);
                         fileOutputStream.close();
 
-                        MyFile newFile = new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName), "/home/rumi/IdeaProjects/File-System-Server/server/./Uploads/"+fileName);
+                        MyFile newFile = new MyFile(fileId, fileName, getFileExtension(fileName));
                         myFiles.add(newFile);
                         fileId++;
                         sendFileInformation(newFile);
@@ -76,48 +80,48 @@ public class Server extends Thread implements Serializable {
                         Main.main.addingSingleNode(fileName);
                     }
 
-            }else if(operation.equalsIgnoreCase("download")){
-                System.out.println(operation);
-                int downloadFileId = dataInputStream.readInt();
-                for(MyFile file: myFiles)
-                {
-                    if(file.getId() == downloadFileId){
-                        File readFile = new File(file.getName());
-                        sendFileToClient(readFile.getName());
-                    }
-                }
-
-
-            }else if(operation.equalsIgnoreCase("delete")){
-                int deleteFileId = dataInputStream.readInt();
-                String filename = "";
-                for(MyFile file: myFiles)
-                {
-                    if(file.getId() == deleteFileId){
-                        File f = new File("Uploads/"+file.getName());
-                        filename = f.getName();
-                        if(f.delete())                      //returns Boolean value
-                        {
-                           String msg = filename+" deleted";
-                           ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-                           objectOutputStream.writeObject(msg);
-                            System.out.println(msg);
+                }else if(operation.equalsIgnoreCase("download")){
+                    System.out.println(operation);
+                    int downloadFileId = dataInputStream.readInt();
+                    for(MyFile file: myFiles)
+                    {
+                        if(file.getId() == downloadFileId){
+                            File readFile = new File(file.getName());
+                            sendFileToClient(readFile.getName());
                         }
-                        deleteFile(deleteFileId);
-                        break;
                     }
+
+
+                }else if(operation.equalsIgnoreCase("delete")){
+                    int deleteFileId = dataInputStream.readInt();
+                    String filename = "";
+                    for(MyFile file: myFiles)
+                    {
+                        if(file.getId() == deleteFileId){
+                            File f = new File("Uploads/"+file.getName());
+                            filename = f.getName();
+                            if(f.delete())                      //returns Boolean value
+                            {
+                                String msg = filename+" deleted";
+                                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                                objectOutputStream.writeObject(msg);
+                                System.out.println(msg);
+                            }
+                            deleteFile(deleteFileId);
+                            break;
+                        }
+                    }
+
+                    Main.main.deleteSingleNode(filename);
+
+                }else if(operation.equalsIgnoreCase("close")){
+                    socket.close();
+                    serverSocket.close();
+                    Server server = new Server(Integer.parseInt(Main.jTextFieldPort.getText()));
+                    server.start();
                 }
 
-                Main.main.deleteSingleNode(filename);
-
-            }else if(operation.equalsIgnoreCase("close")){
-                socket.close();
-                serverSocket.close();
-                Server server = new Server();
-                server.start();
             }
-
-        }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }catch (IOException e) {
@@ -135,33 +139,16 @@ public class Server extends Thread implements Serializable {
         myFiles.clear();
         listOfFiles = folder.listFiles();
         for(File file: listOfFiles){
-            try {
-                FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
-                String fileName = file.getName();
-                byte[] fileContentBytes = new byte[(int)file.length()];
-                if((int) file.length() > 0)
-                {
-                    fileInputStream.read(fileContentBytes);
-                }
 
-                MyFile newFile = new MyFile(fileId,fileName, fileContentBytes,getFileExtension(fileName), file.getAbsolutePath());
-                newFile.setData(fileContentBytes);
-                myFiles.add(newFile);
-                fileId++;
-
-                System.out.println(newFile.getId()+" "+newFile.getName()+" "+newFile.getData().length+" "+newFile.getFileExtension());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            String fileName = file.getName();
+            MyFile newFile = new MyFile(fileId,fileName,getFileExtension(fileName));
+            myFiles.add(newFile);
+            fileId++;
         }
 
     }
 
     public static String getFileExtension(String fileName) {
-        // Get the file type by using the last occurence of . (for example aboutMe.txt returns txt).
-        // Will have issues with files like myFile.tar.gz.
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
             // Set the extension to the extension of the filename.
@@ -174,7 +161,6 @@ public class Server extends Thread implements Serializable {
 
 
     public void sendFileInformation(MyFile newFile) throws IOException {
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         objectOutputStream.writeObject(newFile);
     }
 

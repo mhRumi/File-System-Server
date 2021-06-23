@@ -160,7 +160,17 @@ public class ClientInterface {
         frame.setVisible(true);
     }
     public static void main(String[] args) {
-        new ClientInterface();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                }
+                new ClientInterface();
+            }
+        });
+
     }
 
 

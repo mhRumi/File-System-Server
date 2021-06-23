@@ -59,6 +59,13 @@ public class Listener implements ActionListener {
             Main.dialog.dispose();
         }
         else if (e.getActionCommand().equalsIgnoreCase("start")) {
+            if(Main.jTextFieldPort.getText().equalsIgnoreCase("")){
+                JOptionPane.showMessageDialog(Main.scrollPane, "Please enter port no", "Acknowledgement", JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                Main.startServer();
+
+            }
+
         }
     }
 

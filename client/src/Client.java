@@ -26,6 +26,7 @@ public class Client {
     static OutputStream outputStream = null;
     static DataOutputStream dataOutputStream = null;
     static ObjectInputStream objectInputStream;
+    static ObjectOutputStream objectOutputStream;
     static JFrame jFrame;
     static JFileChooser fileChooser;
 
@@ -39,6 +40,9 @@ public class Client {
              socket = new Socket(host, port);
             Client.outputStream = socket.getOutputStream();
             Client.inputStream = socket.getInputStream();
+            objectInputStream = new ObjectInputStream(inputStream);
+            objectOutputStream  = new ObjectOutputStream(outputStream);
+
             if(socket.isConnected()){
                 getFileInfo();
             }else{
@@ -63,26 +67,27 @@ public class Client {
         }
     }
 
+
     public static void uploadToserver(){
         try {
 
-                    FileInputStream fileInputStream = new FileInputStream(fileToSend[0].getAbsolutePath());
-                    dataOutputStream = new DataOutputStream(Client.outputStream);
-                    String fileName = fileToSend[0].getName();
-                    byte[] fileBytes = new byte[(int)fileToSend[0].length()];
+            FileInputStream fileInputStream = new FileInputStream(fileToSend[0].getAbsolutePath());
+            dataOutputStream = new DataOutputStream(Client.outputStream);
+            String fileName = fileToSend[0].getName();
+            byte[] fileBytes = new byte[(int)fileToSend[0].length()];
 
-                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(Client.outputStream);
-                    String op = new String("upload");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(Client.outputStream);
+            String op = new String("upload");
 
-                    fileInputStream.read(fileBytes); // read file from file system
+            fileInputStream.read(fileBytes); // read file from file system
 
-                    objectOutputStream.writeObject(op); // sending operation
-                    objectOutputStream.writeObject(fileName); // sending file name
+            objectOutputStream.writeObject(op); // sending operation
+            objectOutputStream.writeObject(fileName); // sending file name
 
-                    dataOutputStream.writeInt(fileBytes.length);
-                    dataOutputStream.write(fileBytes);
-                    getSingleElement();
-                    JOptionPane.showMessageDialog(jFrame, "Upload complete", "About", JOptionPane.INFORMATION_MESSAGE);
+            dataOutputStream.writeInt(fileBytes.length);
+            dataOutputStream.write(fileBytes);
+            getSingleElement();
+            JOptionPane.showMessageDialog(jFrame, "Upload complete", "About", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,7 +167,7 @@ public class Client {
     }
 
     public static void getSingleElement() throws IOException, ClassNotFoundException {
-        ObjectInputStream objectInputStream = new ObjectInputStream(Client.inputStream);
+
         Object object = objectInputStream.readObject();
         MyFile newFile = (MyFile) object;
         myFiles.add(newFile);
@@ -173,7 +178,7 @@ public class Client {
     }
 
     public static void getFileInfo() throws IOException, ClassNotFoundException {
-        objectInputStream = new ObjectInputStream(Client.inputStream);
+        myFiles.clear();
         Object object = objectInputStream.readObject();
         myFiles = (ArrayList<MyFile>) object;
 

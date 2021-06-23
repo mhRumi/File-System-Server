@@ -15,6 +15,7 @@ public class Listener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equalsIgnoreCase("Download")){
+
             Client.downloadFile(Client.selectedFileId);
         }else if(e.getActionCommand().equalsIgnoreCase("yes")){
             ShowDialog.closeFrame();
@@ -33,6 +34,12 @@ public class Listener implements ActionListener {
         }
         else if(e.getActionCommand().equalsIgnoreCase("upload")){
             Client.uploadToserver();
+//            ProgressBar frame = new ProgressBar((int) Client.fileToSend[0].length());
+//            frame.pack();
+//            frame.setLocationRelativeTo(null);
+//            frame.setVisible(true);
+//            frame.iterate();
+
         }
         else if(e.getActionCommand().equalsIgnoreCase("close")){
             try {

@@ -47,11 +47,9 @@ public class MyFile implements Serializable {
         this.fileExtension = fileExtension;
     }
 
-    public MyFile(int id, String name, byte[] data, String fileExtension, String absolutePath) {
+    public MyFile(int id, String name, String fileExtension) {
         this.id = id;
         this.name = name;
-        //this.data = data;
         this.fileExtension = fileExtension;
-        this.absolutePath = absolutePath;
     }
 }
