@@ -66,6 +66,7 @@ public class Server extends Thread implements Serializable {
                         byte[] fileContentBytes = new byte[fileContentLength];
                         dataInputStream.readFully(fileContentBytes, 0, fileContentBytes.length);
 
+
                         // Write file to a file
                         File file = new File("Uploads/"+fileName);
                         FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -161,6 +162,7 @@ public class Server extends Thread implements Serializable {
 
 
     public void sendFileInformation(MyFile newFile) throws IOException {
+        objectOutputStream.writeInt(1);
         objectOutputStream.writeObject(newFile);
     }
 
@@ -200,6 +202,8 @@ public class Server extends Thread implements Serializable {
 
                     dataOutputStream.writeInt(fileContentBytes.length);
                     dataOutputStream.write(fileContentBytes);
+
+                    dataOutputStream.writeInt(1);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

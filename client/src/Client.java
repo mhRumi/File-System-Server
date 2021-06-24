@@ -87,7 +87,8 @@ public class Client {
             dataOutputStream.writeInt(fileBytes.length);
             dataOutputStream.write(fileBytes);
             getSingleElement();
-            JOptionPane.showMessageDialog(jFrame, "Upload complete", "About", JOptionPane.INFORMATION_MESSAGE);
+
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -114,13 +115,20 @@ public class Client {
             byte[] fileContentBytes = new byte[fileContentLength];
             dataInputStream.readFully(fileContentBytes, 0, fileContentBytes.length);
 
+            int fileReceived = dataInputStream.readInt();
+
+
             // Write file to a file
-            File file = new File(fileName);
+            File file = new File("downloads/"+fileName);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             fileOutputStream.write(fileContentBytes);
             fileOutputStream.close();
 
-            JOptionPane.showMessageDialog(jFrame, "Download complete", "About", JOptionPane.INFORMATION_MESSAGE);
+            if(fileReceived == 1){
+                JOptionPane.showMessageDialog(jFrame, "Download complete", "About", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -168,12 +176,17 @@ public class Client {
 
     public static void getSingleElement() throws IOException, ClassNotFoundException {
 
+        int fileSend  = objectInputStream.readInt();
+
         Object object = objectInputStream.readObject();
         MyFile newFile = (MyFile) object;
         myFiles.add(newFile);
 
         System.out.println(newFile.getId() + " " + newFile.getName());
         addIntoScrollPanel(newFile);
+        if(fileSend == 1){
+            JOptionPane.showMessageDialog(jFrame, "Upload complete", "About", JOptionPane.INFORMATION_MESSAGE);
+        }
 
     }
 
